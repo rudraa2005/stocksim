@@ -6,34 +6,28 @@ from backend.auth import auth_bp
 from backend.dashboard import dashboard_bp
 from backend.portfolio import portfolio_bp
 from backend.trade import trade_bp
+
 import os
 import json
 import firebase_admin
 from firebase_admin import credentials, firestore
-import tempfile
 
-# Load Firebase credentials from env
+# Load Firebase credentials from environment variable
 firebase_config_str = os.environ.get("GOOGLE_CREDENTIALS")
-
 if not firebase_config_str:
     raise Exception("Missing GOOGLE_CREDENTIALS environment variable.")
 
 firebase_config = json.loads(firebase_config_str)
 
-# Write the credentials to a temporary file
-with tempfile.NamedTemporaryFile(mode="w+", delete=False) as temp_file:
-    json.dump(firebase_config, temp_file)
-    temp_file.flush()  # Ensure all data is written
-    temp_cred_path = temp_file.name
-
-# Initialize Firebase
-cred = credentials.Certificate(temp_cred_path)
+# ✅ Initialize Firebase directly from the parsed dict (no temp files)
+cred = credentials.Certificate(firebase_config)
 firebase_admin.initialize_app(cred)
 
 # Connect to Firestore
 db = firestore.client()
+
 app = Flask(__name__)
-CORS(app) 
+CORS(app)
 app.secret_key = "your-secret-key"
 app.config["JWT_SECRET_KEY"] = "your-jwt-secret-key"
 
@@ -48,6 +42,9 @@ app.register_blueprint(trade_bp)
 @app.route("/")
 def home():
     return "Demo Stock Trading App is running."
+
+if __name__ == "__main__":
+    app.run(debug=True)
 
 if __name__ == "__main__":
     app.run(debug=True)
