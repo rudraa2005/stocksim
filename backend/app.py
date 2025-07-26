@@ -6,11 +6,25 @@ from backend.auth import auth_bp
 from backend.dashboard import dashboard_bp
 from backend.portfolio import portfolio_bp
 from backend.trade import trade_bp
-import json
 import os
-firebase_config = json.loads(os.environ.get("GOOGLE_CREDENTIALS"))
+import json
+import firebase_admin
+from firebase_admin import credentials, firestore
+
+# Load Firebase credentials from the environment variable
+firebase_config_str = os.environ.get("GOOGLE_CREDENTIALS")
+
+if not firebase_config_str:
+    raise Exception("Missing GOOGLE_CREDENTIALS environment variable.")
+
+firebase_config = json.loads(firebase_config_str)
 cred = credentials.Certificate(firebase_config)
 
+# Initialize Firebase Admin
+firebase_admin.initialize_app(cred)
+
+# Initialize Firestore
+db = firestore.client()
 app = Flask(__name__)
 CORS(app) 
 app.secret_key = "your-secret-key"
