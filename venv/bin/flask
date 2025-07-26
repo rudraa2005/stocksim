@@ -1,4 +1,4 @@
-#!/Users/rudranilbhattacharya/demo-stock-trading-app/backend/venv/bin/python3
+#!/Users/rudranilbhattacharya/Documents/demo-stock-trading-app/backend/venv/bin/python3
 # -*- coding: utf-8 -*-
 import re
 import sys
