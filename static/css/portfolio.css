@@ -1,0 +1,121 @@
+/* General Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Body Styling */
+body {
+    font-family: 'Lexend Exa', sans-serif;
+    background: linear-gradient(180deg, #3C3737 27.4%, #6F6767 84.62%, #897E7E 99.99%, #A29696 100%);
+    color: #fff;
+    min-height: 100vh;
+}
+
+/* Container */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+/* Header */
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+
+
+.title {
+    font-family: 'Lexend Zetta', sans-serif;
+    font-weight: 100;
+    font-size: 2.5rem;
+    text-align: center;
+    flex-grow: 1;
+}
+
+.profile {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+}
+
+/* Watchlist */
+.watchlist {
+    align-self: flex-end;
+    background: rgba(217, 217, 217, 0.15);
+    padding: 0.5rem 1.5rem;
+    border-radius: 30px;
+    font-size: 1rem;
+}
+
+/* Table */
+.table-header {
+    display: flex;
+    justify-content: space-between;
+    background: rgba(217, 217, 217, 0.25);
+    border-radius: 20px;
+    padding: 1rem;
+    font-size: 1.2rem;
+    text-align: center;
+}
+
+.table-header div {
+    flex: 1;
+}
+
+/* Total Portfolio */
+.total-portfolio {
+    background: rgba(217, 217, 217, 0.25);
+    border-radius: 20px;
+    text-align: center;
+    padding: 1.5rem;
+    font-size: 1.4rem;
+}
+.table-Row {
+    display: flex;
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+}
+
+.table-Row>div {
+    flex: 1;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .title {
+        font-size: 2rem;
+    }
+
+    .profile {
+        width: 50px;
+        height: 50px;
+    }
+
+    .table-header {
+        flex-direction: column;
+        gap: 1rem;
+        font-size: 1rem;
+    }
+
+    .table-header div {
+        text-align: left;
+    }
+    .table-row {
+        display: flex;
+        padding: 10px;
+        border-bottom: 1px solid #ccc;
+    }
+    
+    .table-row>div {
+        flex: 1;
+    }
+}

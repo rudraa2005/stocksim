@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stock UI</title>
+  <link rel="stylesheet" href="{{url_for("static",filename= "css/buy-sell.css")}}" />
+</head>
+<body id="buysell">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  </div>
+<div class="stock-header">Stock Data:</div>
+
+<!-- Dashboard Button (separate) -->
+<div class="dashboard">
+  <a href="{{ url_for('dashboard.dashboard_home') }}">Dashboard</a>
+</div>
+  <div class="stock-chart-card">
+  <canvas id="stockChart"></canvas>
+</div>
+  <div class="rectangle5">
+    <button id="buy"class="action buy">Buy</button>
+    <input type="number" id="buy-quantity" class="quantity-input" placeholder="Enter quantity" min="1" />
+  </div>
+  <div class="rectangle6">
+    <button id="sell" class="action sell">Sell</button>
+  </div>
+  <div id = "rectangle7" class="rectangle7">
+  </div>
+</body>
+<body>
+<script type="module" src="{{ url_for('static', filename='js/trade.js') }}"></script>
+</body>
+</html>

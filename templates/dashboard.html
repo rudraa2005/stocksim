@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}" />
+  <link href="https://fonts.googleapis.com/css2?family=Lexend+Zetta&family=League+Spartan&display=swap" rel="stylesheet">
+  <linkrel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+</head>
+<body id="dashboard">
+
+<!-- Loading screen -->
+<div id="loader">
+  <div class="spinner"></div>
+</div>
+
+<div id="main-content">
+  <!-- Profile Icon -->
+  <div class="profile"><i class="fa-regular fa-user" style="color: #ffffff;"></i></div>
+
+  <!-- Navigation Menu -->
+  <div class="menu-dashboard">Dashboard</div>
+  <div class="menu-trade"><a href="{{ url_for('trade.trade')}}">Trade</a></div>
+  <div class="menu-watchlist"><a href="{{ url_for('portfolio.portfolio')}}">Portfolio</a></div>
+  <div class="menu-signout"><a href="{{ url_for('auth.login')}}">Sign-out</a></div>
+
+  <!-- Welcome Message -->
+  <div class="welcome">WELCOME, <span id="username-span"></span></div>
+
+  <!-- Portfolio Summary Box -->
+  <div class="summary-box"></div>
+
+  <!-- Total Balance and Profit & Loss -->
+  <div class="total-balance">TOTAL BALANCE:<span id="balance"></span> </div>
+  <div class="total-p">PROFIT:  <span id="p"></span> </div>
+  <div class="total-l">LOSS:  <span id="l"></span> </div>
+
+  <!-- Recent Trades Preview -->
+  <div class="recent-trades">Recent trades →</div>
+
+  <!-- Watchlist Section -->
+  <div class="watchlist-section"></div>
+  <div class="watchlist-heading">WATCHLIST
+    <div id="stock_info"></div>
+  </div>
+  <div id="stock_info"></div>
+</div>
+<script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+</body>
+</html>

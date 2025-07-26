@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Demo Stock Trading App</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}" />
+    <link href="https://fonts.googleapis.com/css2?family=Italiana&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>Demo Stock Trading App</h1>
+            <a href="{{ url_for('auth.register') }}" style="margin-bottom: 10px;">New User?</a>
+        </header>
+
+        <main class="card">
+            <form class="form" method="POST" action="/login">
+                <div class="form-group">
+                    <label for="username">Login</label>
+                    <input type="text" id="username" name="email" placeholder="Enter your username" required />
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name= "password" placeholder="Enter your password" required />
+                </div>
+
+                
+                <button type="submit" class="submit-btn" id="submit">Submit</button>
+
+                <div class="icon"></div>
+            </form>
+        </main>
+    </div>
+</body>
+<body><script type='module' src="{{ url_for('static', filename='js/login.js') }}"></script>
+    <script type='module' src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+</body>
+
+</html>

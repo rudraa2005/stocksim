@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>User Registration</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/register.css') }}" />
+    <link href="https://fonts.googleapis.com/css2?family=Italiana&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+    </head>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>Register New Account</h1>
+        </header>
+
+        <main class="card">
+            <form class="form" method="POST" action="/register">
+                <div class="form-group">
+                    <label for="name">Name</label>
+                    <input type="text" id="name" name="name" required />
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required />
+                </div>
+
+                <div class="form-group pass">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required />
+                </div>
+
+                <div class="form-group">
+                    <label for="confirm">Confirm Password</label>
+                    <input type="password" id="confirm" name="confirm" required />
+                </div>
+
+                <button type="submit" class="submit-btn" id="Create">Create Account</button>
+                <div class="icon"></div>
+            </form>
+        </main>
+    </div>
+</body>
+<body>
+    <script type="module" src = "{{ url_for('static', filename='js/register.js') }}"></script>
+</body>
+</html>

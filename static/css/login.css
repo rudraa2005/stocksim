@@ -1,0 +1,96 @@
+/* Root styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Italiana', serif;
+    background-color: #000000;
+    color: #747272;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+/* App Container */
+.container {
+    width: 100%;
+    max-width: 500px;
+}
+
+/* Header */
+header h1 {
+    text-align: right;
+    font-size: 24px;
+    color: #ffffff;
+    margin-bottom: 30px;
+}
+
+/* Card */
+.card {
+    background: linear-gradient(359.76deg, #050505 50.18%, #6B6B6B 169.46%);
+    border-radius: 30px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.25);
+    padding: 40px 30px;
+}
+
+/* Form */
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+/* Form Groups */
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    font-size: 20px;
+    margin-bottom: 8px;
+}
+
+.form-group input {
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #433A3A;
+    border-radius: 8px;
+    background-color: #fff;
+    color: #000;
+}
+
+/* Submit Button */
+.submit-btn {
+    padding: 12px 20px;
+    font-size: 18px;
+    font-family: 'Italiana', serif;
+    background-color: #827c7c;
+    color: #000;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(239, 173, 173, 0.4);
+    transition: all 0.2s ease;
+}
+
+.submit-btn:hover {
+    background-color: #6f6161;
+    box-shadow: 0 6px 14px rgba(99, 73, 73, 0.6);
+}
+
+/* Decorative Icon */
+.icon {
+    height: 40px;
+    width: 40px;
+    background-image: url('your-image.png');
+    /* Replace with your actual image path */
+    background-size: cover;
+    background-position: center;
+    margin: 20px auto 0;
+}

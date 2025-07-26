@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Portfolio</title>
+  <link rel="stylesheet" href="{{url_for('static',filename="css/portfolio.css")}}" />
+  <link href="https://fonts.googleapis.com/css2?family=Lexend+Exa&family=Lexend+Zetta:wght@100&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="container">
+
+    <!-- Header -->
+    <header class="header">
+      <div class="back-icon"></div>
+      <h1 class="title">My Portfolio</h1>
+      <div class="profile"></div>
+    </header>
+
+    <!-- Watchlist -->
+    <div class="watchlist">
+      <span><a href="{{ url_for('dashboard.dashboard_home') }}">Dashboard</a></span>
+    </div>
+
+    <!-- Table Head -->
+    <div class="table">
+      <div class="table-header">
+        <div>Stock</div>
+        <div> Quantity</div>
+        <div>Price</div>
+        <div>Live Price (₹)</div>
+        <div>Total Value (₹)</div>
+        <div>P/L (₹)</div> 
+      </div>
+      <div id="table-body"></div>
+    </div>
+
+    <!-- Total Value -->
+    <div class="total-portfolio">
+      <p>Total Portfolio Value: ₹<span id="total-value"> </span></p>
+    </div>
+  </div>
+</body>
+<body>
+  <script type="module" src="{{url_for('static',filename="js/portfolio.js")}}" ></script>
+  <script src="{{url_for('static',filename="js/dashboard.js")}}"</script>
+</body>
+</html>
