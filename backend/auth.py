@@ -5,7 +5,6 @@ import datetime
 import firebase_admin
 from firebase_admin import credentials, auth, firestore 
 
-firebase_admin.initialize_app(cred)
 db = firestore.client()
     
 auth_bp = Blueprint("auth", __name__, url_prefix="/auth")
