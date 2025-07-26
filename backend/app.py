@@ -10,20 +10,27 @@ import os
 import json
 import firebase_admin
 from firebase_admin import credentials, firestore
+import tempfile
 
-# Load Firebase credentials from the environment variable
+# Load Firebase credentials from env
 firebase_config_str = os.environ.get("GOOGLE_CREDENTIALS")
 
 if not firebase_config_str:
     raise Exception("Missing GOOGLE_CREDENTIALS environment variable.")
 
 firebase_config = json.loads(firebase_config_str)
-cred = credentials.Certificate(firebase_config)
 
-# Initialize Firebase Admin
+# Write the credentials to a temporary file
+with tempfile.NamedTemporaryFile(mode="w+", delete=False) as temp_file:
+    json.dump(firebase_config, temp_file)
+    temp_file.flush()  # Ensure all data is written
+    temp_cred_path = temp_file.name
+
+# Initialize Firebase
+cred = credentials.Certificate(temp_cred_path)
 firebase_admin.initialize_app(cred)
 
-# Initialize Firestore
+# Connect to Firestore
 db = firestore.client()
 app = Flask(__name__)
 CORS(app) 
