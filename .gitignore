@@ -1,0 +1,24 @@
+# Cache and compiled files
+__pycache__/
+*.pyc
+*.pyo
+
+# macOS metadata
+.DS_Store
+
+# Virtual environments
+venv/
+
+# Firebase key (never upload this!)
+serviceAccount.json
+
+# Editor settings (optional)
+.vscode/
+.idea/
+
+# Image files you mentioned
+51c8ab5715b7352e787ec83b16babbbc82fc7a7d.png
+c33182c00d8219852566c2fee5a9b222b1e8fb9f.png
+house-solid.jpeg
+house-solid.svg
+
