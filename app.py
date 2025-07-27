@@ -10,6 +10,11 @@ from backend.trade import trade_bp
 
 app = Flask(__name__)
 CORS(app)
+firebase_config_str = os.environ.get("GOOGLE_CREDENTIALS")
+firebase_config = json.loads(firebase_config_str)
+cred = credentials.Certificate(firebase_config)
+firebase_admin.initialize_app(cred)
+
 
 app.secret_key = "your-secret-key"
 app.config["JWT_SECRET_KEY"] = "your-jwt-secret-key"
