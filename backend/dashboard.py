@@ -26,6 +26,7 @@ def balance():
         return jsonify({
             "error":"No UID"
         }),400
+    db = get_db() 
     user_ref=db.collection("users").document(uid)
     doc= user_ref.get()
     if doc.exists:
@@ -68,6 +69,7 @@ def update_balance():
     print("curr_price:", curr_price)
     print("live_price:", live_price)
     print("quantity:", quantity)
+    db = get_db() 
     user_ref = db.collection("users").document(uid)
     user_ref.set({
         "balance": new_balance,
@@ -98,6 +100,7 @@ def update_sell():
     balance = data["balance"]
     new_quantity = data["newQuantity"]
     timestamp = data["timestamp"]
+    db = get_db() 
     user_ref = db.collection("users").document(uid)
     ticker = yf.Ticker(symbol)
     history = ticker.history(period="1d", interval="5m")
@@ -118,7 +121,6 @@ def update_sell():
         "livePrice":live_price,
         "sell": True  # key part
     }
-
     db.collection("users").document(uid).collection("trades").add(trade_data)
 
     return jsonify({"message": "Sell recorded and balance updated"}), 200
