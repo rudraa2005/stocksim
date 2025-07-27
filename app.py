@@ -1,19 +1,38 @@
-from flask import Flask, redirect
+from flask import Flask
+from flask import redirect 
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
-import os
-import json
+
 from backend.auth import auth_bp
 from backend.dashboard import dashboard_bp
 from backend.portfolio import portfolio_bp
 from backend.trade import trade_bp
 
-app = Flask(__name__)
-CORS(app)
+import os
+import json
+import firebase_admin
+from firebase_admin import credentials, firestore
+
+# Load Firebase credentials from environment variable
 firebase_config_str = os.environ.get("GOOGLE_CREDENTIALS")
+if not firebase_config_str:
+    raise Exception("Missing GOOGLE_CREDENTIALS environment variable.")
+
 firebase_config = json.loads(firebase_config_str)
+
+# ✅ Initialize Firebase directly from the parsed dict (no temp files)
 cred = credentials.Certificate(firebase_config)
 firebase_admin.initialize_app(cred)
+
+# Connect to Firestore
+db = firestore.client()
+
+app = Flask(__name__)
+CORS(app)
+@app.route("/")
+def home():
+    print("Redirecting to /auth/login")
+    return redirect("/auth/login")
 
 
 app.secret_key = "your-secret-key"
@@ -26,10 +45,3 @@ app.register_blueprint(auth_bp)
 app.register_blueprint(dashboard_bp)
 app.register_blueprint(portfolio_bp)
 app.register_blueprint(trade_bp)
-
-@app.route("/")
-def home():
-    return redirect("/auth/login")
-
-if __name__ == "__main__":
-    app.run(debug=True)
