@@ -1,7 +1,7 @@
 from flask import Flask, redirect
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
-
+import os
 
 from backend.auth import auth_bp
 from backend.dashboard import dashboard_bp
