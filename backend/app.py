@@ -8,22 +8,21 @@ from backend.dashboard import dashboard_bp
 from backend.portfolio import portfolio_bp
 from backend.trade import trade_bp
 
-import os
+from firebase_admin import credentials
 import json
-import firebase_admin
-from firebase_admin import credentials, firestore
+import os
 
-# Load Firebase credentials from environment variable
+# Load the JSON string from the environment
 firebase_config_str = os.environ.get("FIREBASE_CONFIG")
 if not firebase_config_str:
     raise Exception("Missing FIREBASE_CONFIG environment variable.")
 
+# Parse the string
 firebase_config = json.loads(firebase_config_str)
 
-# ✅ Initialize Firebase directly from the parsed dict (no temp files)
-cred = credentials.Certificate(firebase_config)
+# Use from_json (correct method)
+cred = credentials.Certificate._from_json(firebase_config)  # yes, it's a private method
 firebase_admin.initialize_app(cred)
-
 # Connect to Firestore
 db = firestore.client()
 
