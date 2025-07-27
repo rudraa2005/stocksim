@@ -14,9 +14,9 @@ import firebase_admin
 from firebase_admin import credentials, firestore
 
 # Load Firebase credentials from environment variable
-firebase_config_str = os.environ.get("GOOGLE_CREDENTIALS")
+firebase_config_str = os.environ.get("FIREBASE_CONFIG")
 if not firebase_config_str:
-    raise Exception("Missing GOOGLE_CREDENTIALS environment variable.")
+    raise Exception("Missing FIREBASE_CONFIG environment variable.")
 
 firebase_config = json.loads(firebase_config_str)
 
