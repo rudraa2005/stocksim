@@ -29,6 +29,12 @@ db = firestore.client()
 
 app = Flask(__name__)
 CORS(app)
+@app.route("/")
+def home():
+    print("Redirecting to /auth/login")
+    return redirect("/auth/login")
+
+
 app.secret_key = "your-secret-key"
 app.config["JWT_SECRET_KEY"] = "your-jwt-secret-key"
 
@@ -40,10 +46,5 @@ app.register_blueprint(dashboard_bp)
 app.register_blueprint(portfolio_bp)
 app.register_blueprint(trade_bp)
 
-@app.route("/")
-def home():
-    print("Redirecting to /auth/login")
-    return redirect("/auth/login")
 
-if __name__ == "__main__":
-    app.run(debug=True)
+
