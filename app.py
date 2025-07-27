@@ -18,14 +18,20 @@ firebase_config_str = os.environ.get("FIREBASE_CONFIG")
 if not firebase_config_str:
     raise Exception("Missing FIREBASE_CONFIG environment variable.")
 
-# ✅ Write the JSON string to a temp file
-with tempfile.NamedTemporaryFile(delete=False, mode="w", suffix=".json") as f:
-    f.write(firebase_config_str)
+# ✅ Deserialize the string
+firebase_config = json.loads(firebase_config_str)
+
+# ✅ Write the dict into a temp JSON file properly
+with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
+    json.dump(firebase_config, f)
+    f.flush()  # flush to ensure contents are written
     firebase_cred_path = f.name
 
+# ✅ Initialize Firebase using the file path
 cred = credentials.Certificate(firebase_cred_path)
 firebase_admin.initialize_app(cred)
 
+# ✅ Initialize Firestore
 db = firestore.client()
 
 app = Flask(__name__)
