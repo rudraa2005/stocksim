@@ -41,7 +41,7 @@ app.register_blueprint(trade_bp)
 
 @app.route("/")
 def home():
-    return "Demo Stock Trading App is running."
+    return redirect("/auth/login") 
 
 if __name__ == "__main__":
     app.run(debug=True)
