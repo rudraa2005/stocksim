@@ -42,7 +42,8 @@ app.register_blueprint(trade_bp)
 
 @app.route("/")
 def home():
-    return redirect("/auth/login") 
+    print("Redirecting to /auth/login")
+    return redirect("/auth/login")
 
 if __name__ == "__main__":
     app.run(debug=True)
