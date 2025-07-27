@@ -23,6 +23,7 @@ def register():
         uid = decoded_token["uid"]
         name = data.get("name")
         email = data.get("email")
+        db = get_db()
         db.collection('users').document(uid).set({
             'name': name,
             'email': email,
