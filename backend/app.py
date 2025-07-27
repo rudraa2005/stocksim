@@ -1,4 +1,5 @@
-from flask import Flask, redirect
+from flask import Flask
+from flask import redirect 
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 
@@ -42,9 +43,6 @@ app.register_blueprint(trade_bp)
 @app.route("/")
 def home():
     return redirect("/auth/login") 
-
-if __name__ == "__main__":
-    app.run(debug=True)
 
 if __name__ == "__main__":
     app.run(debug=True)
