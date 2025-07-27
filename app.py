@@ -21,8 +21,7 @@ if not firebase_config_str:
 firebase_config = json.loads(firebase_config_str)
 
 # ✅ Initialize Firebase directly from the parsed dict (no temp files)
-cred = credentials.Certificate(firebase_config)
-firebase_admin.initialize_app(cred)
+cred = credentials.Certificate.from_json(firebase_config)
 
 # Connect to Firestore
 db = firestore.client()
