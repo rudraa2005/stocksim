@@ -20,6 +20,7 @@ def portfolio():
 @portfolio_bp.route("/portfolio/trades")
 def trades():
     uid=request.args.get("uid")
+    db = get_db() 
     user_ref=db.collection("users").document(uid).collection("trades")
     docs = user_ref.stream()
     result=[]
