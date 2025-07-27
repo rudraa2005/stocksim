@@ -13,19 +13,18 @@ import json
 import firebase_admin
 from firebase_admin import credentials, firestore
 
-# Read the JSON string from environment variable
 firebase_config_str = os.environ.get("FIREBASE_CONFIG")
 if not firebase_config_str:
     raise Exception("Missing FIREBASE_CONFIG environment variable.")
 
-# Parse the string into a dictionary
+# ✅ Parse the string into a dict
 firebase_config = json.loads(firebase_config_str)
 
-# Pass the dict directly to Certificate()
+# ✅ This is now a dictionary, so it's safe to pass directly
 cred = credentials.Certificate(firebase_config)
 firebase_admin.initialize_app(cred)
 
-# Firestore client
+# ✅ Access Firestore if needed
 db = firestore.client()
 
 app = Flask(__name__)
