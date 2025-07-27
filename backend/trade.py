@@ -11,6 +11,8 @@ from firebase_admin import credentials, auth, firestore
 from urllib.request import urlopen
 import time
 
+def get_db():
+    return firestore.client()
 # Cache dictionary (10-minute cache)
 cached_trade_stocks = {
     "timestamp": 0,
