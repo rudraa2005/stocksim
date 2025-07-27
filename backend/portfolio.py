@@ -8,13 +8,10 @@ import ssl
 from urllib.request import urlopen
 import firebase_admin
 from firebase_admin import credentials, firestore
+from firebase_admin import auth
 
-
-if not firebase_admin._apps:
-    cred = credentials.Certificate("serviceAccount.json")
-    firebase_admin.initialize_app(cred)
-db = firestore.client()
-
+def get_db():
+    return firestore.client()
 
 @portfolio_bp.route("/portfolio")
 def portfolio():
