@@ -1,6 +1,7 @@
-from flask import Flask
+from flask import Flask, redirect
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
+
 
 from backend.auth import auth_bp
 from backend.dashboard import dashboard_bp
@@ -23,7 +24,7 @@ app.register_blueprint(trade_bp)
 
 @app.route("/")
 def home():
-    return "Demo Stock Trading App is running."
+    return redirect("/auth/login")
 
 if __name__ == "__main__":
     app.run(debug=True)
