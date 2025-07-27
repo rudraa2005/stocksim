@@ -8,22 +8,24 @@ from backend.dashboard import dashboard_bp
 from backend.portfolio import portfolio_bp
 from backend.trade import trade_bp
 
-from firebase_admin import credentials
-import json
 import os
+import json
+import tempfile
+import firebase_admin
+from firebase_admin import credentials, firestore
 
-# Load the JSON string from the environment
 firebase_config_str = os.environ.get("FIREBASE_CONFIG")
 if not firebase_config_str:
     raise Exception("Missing FIREBASE_CONFIG environment variable.")
 
-# Parse the string
-firebase_config = json.loads(firebase_config_str)
+# ✅ Write the JSON string to a temp file
+with tempfile.NamedTemporaryFile(delete=False, mode="w", suffix=".json") as f:
+    f.write(firebase_config_str)
+    firebase_cred_path = f.name
 
-# Use from_json (correct method)
-cred = credentials.Certificate._from_json(firebase_config)  # yes, it's a private method
+cred = credentials.Certificate(firebase_cred_path)
 firebase_admin.initialize_app(cred)
-# Connect to Firestore
+
 db = firestore.client()
 
 app = Flask(__name__)
