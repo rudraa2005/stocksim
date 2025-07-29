@@ -30,8 +30,8 @@ StockSim is a simulated stock trading dashboard that lets users practice trading
 
 | Frontend        | Backend     | Database      | Tools         |
 |----------------|-------------|---------------|----------------|
-| HTML/CSS/JS     | Flask (Python) | Firebase Firestore | Chart.js     |
-| Bootstrap (optional) | Flask-JWT-Extended | Firebase Auth     | Render (Hosting) |
+| HTML/CSS    | Flask (Python) | Firebase Firestore | Chart.js     |
+| JS | Flask-JWT-Extended | Firebase Auth     | Render (Hosting) |
 
 ---
 
@@ -41,5 +41,5 @@ StockSim is a simulated stock trading dashboard that lets users practice trading
 
 1. **Clone the repo**
    ```bash
-   git clone https://github.com/your-username/StockSim.git
+   git clone https://github.com/rudraa05/StockSim.git
    cd StockSim/backend
