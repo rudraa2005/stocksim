@@ -20,14 +20,6 @@ if not firebase_config_str:
 
 
 firebase_config = json.loads(firebase_config_str)
-
-
-with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
-    json.dump(firebase_config, f)
-    f.flush()  # flush to ensure contents are written
-    firebase_cred_path = f.name
-
-
 cred = credentials.Certificate(firebase_cred_path)
 firebase_admin.initialize_app(cred)
 
