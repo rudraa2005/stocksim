@@ -8,6 +8,21 @@ import ssl
 from urllib.request import urlopen
 import firebase_admin
 from firebase_admin import credentials, firestore
+from flask import current_app as app
+import traceback
+
+def json_error(status=500, message="Internal server error", body=None):
+    resp = {"error": message}
+    if body:
+        resp["detail"] = body
+    return jsonify(resp), status
+
+def json_error(status=500, message="Internal server error", body=None):
+    resp = {"error": message}
+    if body:
+        resp["detail"] = body
+    return jsonify(resp), status
+
 
 def get_db():
     return firestore.client()
@@ -18,10 +33,8 @@ def dashboard_home():
     return render_template("dashboard.html")
 
 @dashboard_bp.route("/dashboard/balance", methods=["GET"])
-
 def balance():
     uid=request.args.get("uid")
-
     if not uid:
         return jsonify({
             "error":"No UID"
@@ -126,21 +139,17 @@ def update_sell():
     return jsonify({"message": "Sell recorded and balance updated"}), 200
 
 @dashboard_bp.route("/dashboard/watchlist", methods=["GET"])
-
 def watchlist():
-    url= "https://en.wikipedia.org/wiki/List_of_S%26P_500_companies"
-    context = ssl._create_unverified_context()
-
-#  Open the URL while ignoring SSL certificate errors
-    html = urlopen(url, context=context)
-
-# Parse tables from HTML content
-    table = pd.read_html(html)[0]
-    all_tickers= table["Symbol"].tolist()      #creating a list this becomes an array when we jsonify it 
-    random_tickers = random.sample(all_tickers, 5)
-    
-    stock_data=[] #empty array to store the data
-    for ticker in random_tickers:
+    try:
+        url= "https://en.wikipedia.org/wiki/List_of_S%26P_500_companies"
+        context = ssl._create_unverified_context()  
+        html = urlopen(url, context=context)
+        table = pd.read_html(html)[0]
+        all_tickers= table["Symbol"].tolist()      #creating a list this becomes an array when we jsonify it 
+        random_tickers = random.sample(all_tickers, 5)
+        
+        stock_data=[] #empty array to store the data
+        for ticker in random_tickers:
             stock=yf.Ticker(ticker)
             info = stock.info
             stock_data.append({
@@ -148,4 +157,10 @@ def watchlist():
                 "symbol": ticker,
                 "price": info.get("currentPrice") 
             })
-    return jsonify(stock_data)
+        
+        return jsonify(stock_data)
+        
+    except Exception as e:
+        app.logger.error("Watchlist exception: %s\n%s", e, traceback.format_exc())
+        return json_error(500, "Failed to load watchlist")
+        
