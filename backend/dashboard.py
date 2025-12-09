@@ -144,42 +144,23 @@ def update_sell():
 @dashboard_bp.route("/dashboard/watchlist", methods=["GET"])
 def watchlist():
     try:
-        url = "https://en.wikipedia.org/wiki/List_of_S%26P_500_companies"
-        headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-                          "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36"
-        }
-        resp = request.get(url, headers=headers, timeout=10)
-        resp.raise_for_status()
-        # pandas can parse from a bytes/text object
-        table = pd.read_html(resp.text)[0]
-        all_tickers = table["Symbol"].tolist()
-        random_tickers = random.sample(all_tickers, min(5, len(all_tickers)))
+        url = "https://raw.githubusercontent.com/datasets/s-and-p-500-companies/master/data/constituents_symbols.txt"
+        r = requests.get(url, timeout=8)
+        r.raise_for_status()
+
+        tickers = [line.strip() for line in r.text.splitlines() if line.strip()]
+        random_tickers = random.sample(tickers, 5)
 
         stock_data = []
-        for ticker in random_tickers:
-            try:
-                stock = yf.Ticker(ticker)
-                info = stock.info or {}
-                stock_data.append({
-                    "name": info.get("shortName", ticker),
-                    "symbol": ticker,
-                    "price": info.get("currentPrice")  # may be None
-                })
-            except Exception:
-                # per-symbol failure shouldn't blow up entire response
-                stock_data.append({"name": ticker, "symbol": ticker, "price": None})
+        for t in random_tickers:
+            info = yf.Ticker(t).info
+            stock_data.append({
+                "name": info.get("shortName", t),
+                "symbol": t,
+                "price": info.get("currentPrice")
+            })
 
         return jsonify(stock_data)
 
     except Exception as e:
-        app.logger.error("Watchlist error: %s\n%s", e, traceback.format_exc())
-        # fallback static list so frontend still has something to show
-        fallback = [
-            {"name": "Apple Inc.", "symbol": "AAPL", "price": None},
-            {"name": "Microsoft Corp.", "symbol": "MSFT", "price": None},
-            {"name": "Amazon.com, Inc.", "symbol": "AMZN", "price": None},
-            {"name": "Alphabet Inc. (Class A)", "symbol": "GOOGL", "price": None},
-            {"name": "Tesla, Inc.", "symbol": "TSLA", "price": None},
-        ]
-        return jsonify({"error": "Failed to load watchlist", "fallback": fallback}), 500
+        return jsonify({"error": "Failed to load watchlist"}), 500
