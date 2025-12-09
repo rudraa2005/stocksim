@@ -50,7 +50,7 @@ fetch("dashboard/watchlist", {
 })
 .catch((err) => {
     console.error("Error fetching watchlist:", err);
-    // Optionally show an error message
+
 })
 .finally(()=>{
   document.getElementById("loader").style.display= "none";
