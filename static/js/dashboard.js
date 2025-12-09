@@ -1,74 +1,76 @@
 document.addEventListener("DOMContentLoaded", () => {
   const token = localStorage.getItem("token");
   const uid = localStorage.getItem("uid");
-  const nameFromStorage = localStorage.getItem("name");
+  const nameFromStorage = localStorage.getItem("name") || "";
 
-  // DOM nodes (cache once)
+  // Cached DOM nodes (ensure these IDs exist in your HTML)
   const loader = document.getElementById("loader");
   const mainContent = document.getElementById("main-content");
-  const balanceElem = document.getElementById("balance");      // ensure HTML has id="balance"
-  const profitElem = document.getElementById("p");             // ensure id="p"
-  const lossElem = document.getElementById("l");               // ensure id="l"
+  const balanceElem = document.getElementById("balance");
+  const profitElem = document.getElementById("p");
+  const lossElem = document.getElementById("l");
   const usernameSpan = document.getElementById("username-span");
   const watchlistContainer = document.getElementById("stock_info");
-  const watchlistError = document.getElementById("watchlist-error"); // optional element for errors
+  const watchlistError = document.getElementById("watchlist-error");
 
-  // show loader
-  if (loader) loader.style.display = "flex";
-  if (mainContent) mainContent.style.display = "none";
+  const showLoader = () => { if (loader) loader.style.display = "flex"; if (mainContent) mainContent.style.display = "none"; };
+  const hideLoader = () => { if (loader) loader.style.display = "none"; if (mainContent) mainContent.style.display = "block"; };
 
+  // If auth missing, redirect to login early
   if (!token || !uid) {
     alert("Session expired. Please log in.");
     window.location.href = "/auth/login";
     return;
   }
 
-  // small helper to fetch and ensure JSON
+  // Helper: fetch and ensure JSON response, attach Authorization header automatically
   async function fetchJson(url, opts = {}) {
-    const res = await fetch(url, Object.assign({ headers: { Authorization: `Bearer ${token}` } }, opts));
-    const ct = res.headers.get("content-type") || "";
-    if (!res.ok) {
-      // get text for debugging
+    const headers = Object.assign({}, opts.headers || {}, { Authorization: `Bearer ${token}` });
+    const response = await fetch(url, Object.assign({}, opts, { headers }));
+    const contentType = response.headers.get("content-type") || "";
+
+    if (!response.ok) {
+      // capture body safely for debugging
       let body = "";
-      try { body = await res.text(); } catch (e) { body = String(e); }
-      const err = new Error(`HTTP ${res.status}`);
-      err.status = res.status;
+      try { body = await response.text(); } catch (e) { body = String(e); }
+      const err = new Error(`HTTP ${response.status}`);
+      err.status = response.status;
       err.body = body;
       throw err;
     }
-    if (!ct.includes("application/json")) {
-      const text = await res.text();
+
+    if (!contentType.includes("application/json")) {
+      const text = await response.text();
       const err = new Error("Non-JSON response");
-      err.status = res.status;
+      err.status = response.status;
       err.body = text;
       throw err;
     }
-    return res.json();
+
+    return response.json();
   }
 
-  // Fetch protected dashboard (optional)
+  // Optional: verify the dashboard page is reachable (no body required)
   fetch("/dashboard", { headers: { Authorization: `Bearer ${token}` } })
     .then((res) => {
-      // we don't need body; if res is not ok it will be noticed in next lines
       if (!res.ok) throw new Error("Dashboard page fetch failed");
       console.log("Protected data fetched successfully");
     })
     .catch((err) => console.error("Error fetching protected data:", err));
 
-  // Balance
+  // Load and render balance (safe guards for undefined values)
   (async () => {
     try {
       const data = await fetchJson(`/dashboard/balance?uid=${encodeURIComponent(uid)}`);
-      // guard fields
-      const balance = typeof data.balance === "number" ? data.balance : null;
-      const profit = typeof data.profit === "number" ? data.profit : null;
-      const loss = typeof data.loss === "number" ? data.loss : null;
-      const username = data.name || nameFromStorage || "";
+      const balance = (typeof data.balance === "number") ? data.balance : 0;
+      const profit = (typeof data.profit === "number") ? data.profit : 0;
+      const loss = (typeof data.loss === "number") ? data.loss : 0;
+      const username = data.name || nameFromStorage;
 
-      if (balanceElem) balanceElem.innerText = balance !== null ? `₹${balance.toFixed(2)}` : "₹0.00";
-      if (profitElem) profitElem.innerText = profit !== null ? `₹${profit.toFixed(2)}` : "₹0.00";
-      if (lossElem) lossElem.innerText = loss !== null ? `₹${loss.toFixed(2)}` : "₹0.00";
-      if (usernameSpan && username) usernameSpan.innerText = username.toUpperCase();
+      if (balanceElem) balanceElem.innerText = `₹${Number(balance).toFixed(2)}`;
+      if (profitElem) profitElem.innerText = `₹${Number(profit).toFixed(2)}`;
+      if (lossElem) lossElem.innerText = `₹${Number(loss).toFixed(2)}`;
+      if (usernameSpan && username) usernameSpan.innerText = String(username).toUpperCase();
     } catch (err) {
       console.error("Error fetching balance:", err.status || err.message, err.body || "");
       if (balanceElem) balanceElem.innerText = "₹0.00";
@@ -76,31 +78,46 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   })();
 
-  // Watchlist
+  // Load and render watchlist (supports array or { fallback: [...] } response)
   (async () => {
+    showLoader();
     try {
       const data = await fetchJson("/dashboard/watchlist");
-      console.log("API response:", data);
+      let items = [];
 
-      if (!Array.isArray(data)) {
-        throw new Error("Expected watchlist array");
+      if (Array.isArray(data)) {
+        items = data;
+      } else if (data && Array.isArray(data.fallback)) {
+        items = data.fallback;
+      } else {
+        throw new Error("Unexpected watchlist shape");
       }
 
       if (watchlistContainer) {
-        watchlistContainer.innerHTML = ""; // clear existing
-        data.forEach((stock) => {
-          const stockElement = document.createElement("p");
-          const displayPrice = typeof stock.price === "number" ? `₹${stock.price}` : stock.price || "—";
-          stockElement.textContent = `${stock.name} (${stock.symbol}) - ${displayPrice}`;
-          watchlistContainer.appendChild(stockElement);
+        watchlistContainer.innerHTML = "";
+        items.forEach((stock) => {
+          const name = stock.name || stock.symbol || "Unknown";
+          const symbol = stock.symbol || "";
+          const price = (typeof stock.price === "number") ? `₹${Number(stock.price).toFixed(2)}` : (stock.price || "—");
+          const p = document.createElement("p");
+          p.textContent = `${name} ${symbol ? `(${symbol})` : ""} - ${price}`;
+          watchlistContainer.appendChild(p);
         });
       }
     } catch (err) {
       console.error("Error fetching watchlist:", err.status || err.message, err.body || "");
       if (watchlistError) watchlistError.innerText = "Could not load watchlist.";
+      // optionally show a small static fallback if container exists
+      if (watchlistContainer && watchlistContainer.children.length === 0) {
+        const fallback = ["AAPL", "MSFT", "AMZN", "GOOGL", "TSLA"];
+        fallback.forEach((s) => {
+          const p = document.createElement("p");
+          p.textContent = s;
+          watchlistContainer.appendChild(p);
+        });
+      }
     } finally {
-      if (loader) loader.style.display = "none";
-      if (mainContent) mainContent.style.display = "block";
+      hideLoader();
     }
   })();
 });
