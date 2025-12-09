@@ -26,7 +26,7 @@ def trade():
 def get_stocks():
     try:
         now = time.time()
-        cache_duration = 60000000000000000000000000000000000000000
+        cache_duration = 600
 
         # Use cached data if fresh
         if cached_trade_stocks["data"] and now - cached_trade_stocks["timestamp"] < cache_duration:
