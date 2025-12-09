@@ -19,9 +19,9 @@
     e.preventDefault();
     const email = document.getElementById("username").value;
     const password = document.getElementById("password").value;
-    console.log("🧪 Email Input:", email);
-    console.log("🧪 Password Input:", password);
-    console.log("🧪 Email Valid:", /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email));
+    console.log(" Email Input:", email);
+    console.log("Password Input:", password);
+    console.log(" Email Valid:", /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email));
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
