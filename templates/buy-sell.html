@@ -3,32 +3,37 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Stock UI</title>
-  <link rel="stylesheet" href="{{url_for("static",filename= "css/buy-sell.css")}}" />
+  <title>Buy/Sell - Stock Simulator</title>
+  <link rel="stylesheet" href="{{url_for('static',filename='css/buy-sell.css')}}" />
+  <link href="https://fonts.googleapis.com/css2?family=League+Spartan&family=Lexend+Zetta&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body id="buysell">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  </div>
-<div class="stock-header">Stock Data:</div>
+  <div class="stock-header">Stock Trading</div>
 
-<!-- Dashboard Button (separate) -->
-<div class="dashboard">
-  <a href="{{ url_for('dashboard.dashboard_home') }}">Dashboard</a>
-</div>
+  <!-- Dashboard Button -->
+  <div class="dashboard">
+    <a href="{{ url_for('dashboard.dashboard_home') }}">← Dashboard</a>
+  </div>
+
+  <!-- Stock Info Card -->
+  <div id="rectangle7" class="rectangle7">
+  </div>
+
+  <!-- Stock Chart -->
   <div class="stock-chart-card">
-  <canvas id="stockChart"></canvas>
-</div>
+    <canvas id="stockChart"></canvas>
+  </div>
+
+  <!-- Buy/Sell Controls -->
   <div class="rectangle5">
-    <button id="buy"class="action buy">Buy</button>
-    <input type="number" id="buy-quantity" class="quantity-input" placeholder="Enter quantity" min="1" />
+    <button id="buy" class="action buy">Buy</button>
   </div>
   <div class="rectangle6">
     <button id="sell" class="action sell">Sell</button>
   </div>
-  <div id = "rectangle7" class="rectangle7">
-  </div>
-</body>
-<body>
-<script type="module" src="{{ url_for('static', filename='js/trade.js') }}"></script>
+  <input type="number" id="buy-quantity" class="quantity-input" placeholder="Enter quantity" min="1" />
+
+  <script type="module" src="{{ url_for('static', filename='js/trade.js') }}"></script>
 </body>
 </html>

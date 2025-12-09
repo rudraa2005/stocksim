@@ -1,4 +1,4 @@
-/* Root styles */
+/* Modern Reset */
 * {
     margin: 0;
     padding: 0;
@@ -6,9 +6,9 @@
 }
 
 body {
-    font-family: 'Italiana', serif;
-    background-color: #000000;
-    color: #747272;
+    font-family: 'League Spartan', sans-serif;
+    background: radial-gradient(50% 119.08% at 50% 50%, #1C1B1B 0%, #827C7C 0%, #595555 0%, #4B4848 0%, #323030 0%, #1C1B1B 93%);
+    color: #fff;
     min-height: 100vh;
     display: flex;
     justify-content: center;
@@ -23,26 +23,49 @@ body {
 }
 
 /* Header */
+header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
 header h1 {
-    text-align: right;
-    font-size: 24px;
+    font-family: 'Lexend Zetta', sans-serif;
+    font-size: 2.5rem;
+    font-weight: 300;
     color: #ffffff;
-    margin-bottom: 30px;
+    margin-bottom: 1rem;
+    letter-spacing: 2px;
+}
+
+header a {
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    display: inline-block;
+    margin-top: 0.5rem;
+}
+
+header a:hover {
+    color: #4CAF50;
+    transform: translateY(-2px);
 }
 
 /* Card */
 .card {
-    background: linear-gradient(359.76deg, #050505 50.18%, #6B6B6B 169.46%);
-    border-radius: 30px;
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.25);
-    padding: 40px 30px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 24px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    padding: 3rem 2.5rem;
+    backdrop-filter: blur(10px);
 }
 
 /* Form */
 .form {
     display: flex;
     flex-direction: column;
-    gap: 30px;
+    gap: 1.75rem;
 }
 
 /* Form Groups */
@@ -52,45 +75,93 @@ header h1 {
 }
 
 .form-group label {
-    font-size: 20px;
-    margin-bottom: 8px;
+    font-size: 1rem;
+    margin-bottom: 0.75rem;
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 500;
+    letter-spacing: 1px;
+    text-transform: uppercase;
 }
 
 .form-group input {
-    padding: 10px;
-    font-size: 16px;
-    border: 1px solid #433A3A;
-    border-radius: 8px;
-    background-color: #fff;
-    color: #000;
+    padding: 1rem 1.25rem;
+    font-size: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    font-family: 'League Spartan', sans-serif;
+    transition: all 0.3s ease;
+    outline: none;
+}
+
+.form-group input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.form-group input:focus {
+    border-color: #4CAF50;
+    background: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
 }
 
 /* Submit Button */
 .submit-btn {
-    padding: 12px 20px;
-    font-size: 18px;
-    font-family: 'Italiana', serif;
-    background-color: #827c7c;
-    color: #000;
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+    font-family: 'League Spartan', sans-serif;
+    background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+    color: #fff;
     border: none;
-    border-radius: 10px;
+    border-radius: 12px;
     cursor: pointer;
-    box-shadow: 0 4px 10px rgba(239, 173, 173, 0.4);
-    transition: all 0.2s ease;
+    box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+    transition: all 0.3s ease;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 0.5rem;
 }
 
 .submit-btn:hover {
-    background-color: #6f6161;
-    box-shadow: 0 6px 14px rgba(99, 73, 73, 0.6);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+    background: linear-gradient(135deg, #45a049 0%, #4CAF50 100%);
+}
+
+.submit-btn:active {
+    transform: translateY(0);
 }
 
 /* Decorative Icon */
 .icon {
     height: 40px;
     width: 40px;
-    background-image: url('your-image.png');
-    /* Replace with your actual image path */
-    background-size: cover;
-    background-position: center;
-    margin: 20px auto 0;
+    margin: 1.5rem auto 0;
+    opacity: 0.3;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    header h1 {
+        font-size: 2rem;
+    }
+
+    .card {
+        padding: 2rem 1.5rem;
+    }
+
+    .form-group label {
+        font-size: 0.9rem;
+    }
+
+    .form-group input {
+        padding: 0.875rem 1rem;
+        font-size: 0.95rem;
+    }
+
+    .submit-btn {
+        padding: 0.875rem 1.5rem;
+        font-size: 1rem;
+    }
 }

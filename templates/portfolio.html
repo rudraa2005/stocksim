@@ -4,29 +4,43 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>My Portfolio</title>
-  <link rel="stylesheet" href="{{url_for('static',filename="css/portfolio.css")}}" />
-  <link href="https://fonts.googleapis.com/css2?family=Lexend+Exa&family=Lexend+Zetta:wght@100&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{url_for('static',filename='css/portfolio.css')}}" />
+  <link href="https://fonts.googleapis.com/css2?family=Lexend+Exa&family=Lexend+Zetta:wght@100&family=League+Spartan&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
   <div class="container">
 
     <!-- Header -->
     <header class="header">
-      <div class="back-icon"></div>
+      <div class="back-icon" onclick="window.location.href='{{ url_for('dashboard.dashboard_home') }}'">
+        <i class="fa-solid fa-arrow-left" style="color: #ffffff;"></i>
+      </div>
       <h1 class="title">My Portfolio</h1>
-      <div class="profile"></div>
+      <div class="profile">
+        <i class="fa-regular fa-user" style="color: #ffffff;"></i>
+      </div>
     </header>
 
-    <!-- Watchlist -->
+    <!-- Navigation Link -->
     <div class="watchlist">
-      <span><a href="{{ url_for('dashboard.dashboard_home') }}">Dashboard</a></span>
+      <span><a href="{{ url_for('dashboard.dashboard_home') }}">← Back to Dashboard</a></span>
+    </div>
+
+    <!-- Chart Section -->
+    <div class="chart-section">
+      <h2 class="chart-title">Trading Activity Over Time</h2>
+      <div class="chart-container">
+        <canvas id="portfolioChart"></canvas>
+      </div>
     </div>
 
     <!-- Table Head -->
     <div class="table">
       <div class="table-header">
         <div>Stock</div>
-        <div> Quantity</div>
+        <div>Quantity</div>
         <div>Price</div>
         <div>Live Price (₹)</div>
         <div>Total Value (₹)</div>
@@ -37,12 +51,10 @@
 
     <!-- Total Value -->
     <div class="total-portfolio">
-      <p>Total Portfolio Value: ₹<span id="total-value"> </span></p>
+      <p>Total Portfolio Value: ₹<span id="total-value">0.00</span></p>
     </div>
   </div>
-</body>
-<body>
-  <script type="module" src="{{url_for('static',filename="js/portfolio.js")}}" ></script>
-  <script src="{{url_for('static',filename="js/dashboard.js")}}"</script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js"></script>
+  <script type="module" src="{{url_for('static',filename='js/portfolio.js')}}"></script>
 </body>
 </html>

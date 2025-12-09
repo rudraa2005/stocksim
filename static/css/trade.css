@@ -1,45 +1,153 @@
+/* Modern Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
 body {
-    background: #111;
-    font-family: Arial, sans-serif;
+    background: radial-gradient(50% 119.08% at 50% 50%, #1C1B1B 0%, #827C7C 0%, #595555 0%, #4B4848 0%, #323030 0%, #1C1B1B 93%);
+    font-family: 'League Spartan', sans-serif;
     color: white;
+    min-height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
-    margin: 0;
+    padding: 2rem;
 }
 
 .container {
-    background: linear-gradient(to bottom, #1a1a1a, #0f0f0f);
-    padding: 40px;
-    border-radius: 12px;
-    width: 400px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 24px;
+    padding: 3rem;
+    width: 100%;
+    max-width: 600px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
 label {
-    font-size: 18px;
-    letter-spacing: 3px;
+    font-size: 1.25rem;
+    letter-spacing: 2px;
     display: block;
-    margin-bottom: 10px;
+    margin-bottom: 1rem;
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 500;
 }
 
 select {
     width: 100%;
-    padding: 10px;
-    font-size: 16px;
-    background: #eee;
-    color: #000;
-    border: none;
+    padding: 1rem;
+    font-size: 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
     outline: none;
     appearance: none;
-    position: relative;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'League Spartan', sans-serif;
+}
+
+select:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+select:focus {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: #4CAF50;
+    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+}
+
+select option {
+    background: #2C2C2C;
+    color: #fff;
+    padding: 0.5rem;
 }
 
 .news-panel {
-    margin-top: 40px;
-    background: linear-gradient(to right, #1f1a1a, #5c5353);
-    padding: 30px;
-    border-radius: 40px;
-    border: 2px solid #3da6ff;
-    min-height: 50px;
+    margin-top: 2.5rem;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%);
+    padding: 2rem;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    min-height: 150px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    backdrop-filter: blur(10px);
+}
+
+.news-panel p {
+    font-size: 1.1rem;
+    color: rgba(255, 255, 255, 0.8);
+    text-align: center;
+    margin: 0;
+}
+
+#select-button {
+    background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+    color: white;
+    border: none;
+    padding: 1rem 2.5rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'League Spartan', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+}
+
+#select-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+    background: linear-gradient(135deg, #45a049 0%, #4CAF50 100%);
+}
+
+#select-button:active {
+    transform: translateY(0);
+}
+
+#select-button a {
+    color: white;
+    text-decoration: none;
+    display: block;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    body {
+        padding: 1rem;
+    }
+
+    .container {
+        padding: 2rem 1.5rem;
+    }
+
+    label {
+        font-size: 1rem;
+    }
+
+    select {
+        padding: 0.875rem;
+        font-size: 0.95rem;
+    }
+
+    .news-panel {
+        padding: 1.5rem;
+        margin-top: 2rem;
+    }
+
+    #select-button {
+        padding: 0.875rem 2rem;
+        font-size: 1rem;
+    }
 }

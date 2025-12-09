@@ -3,23 +3,21 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Trade UI</title>
+  <title>Trade - Stock Simulator</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/trade.css') }}"/>
+  <link href="https://fonts.googleapis.com/css2?family=League+Spartan&family=Lexend+Zetta&display=swap" rel="stylesheet">
 </head>
 <body id="trade">
   <div class="container">
-    <label for="stock-select">Stocks:</label>
+    <label for="stock-select">Select Stock:</label>
     <select id="stock-select">
-      <option value="" disabled selected>Select a stock</option>
+      <option value="" disabled selected>Choose a stock to trade</option>
     </select>
-     <div class="news-panel" id="news-panel">
-      <p>Select a stock to buy/sell.</p>
-      <button id = "select-button"><a href ="{{url_for("trade.buysell")}}"> click </a></button>
+    <div class="news-panel" id="news-panel">
+      <p>Select a stock from the dropdown above to proceed with buying or selling.</p>
+      <button id="select-button"><a href="{{url_for('trade.buysell')}}">Continue →</a></button>
     </div>
   </div>
-  </div>
-</body>
-<body>
-<script type="module"src="{{ url_for('static', filename='js/trade.js') }}"></script>
+  <script type="module" src="{{ url_for('static', filename='js/trade.js') }}"></script>
 </body>
 </html>
