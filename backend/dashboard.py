@@ -149,7 +149,7 @@ def watchlist():
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
                           "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36"
         }
-        resp = requests.get(url, headers=headers, timeout=10)
+        resp = request.get(url, headers=headers, timeout=10)
         resp.raise_for_status()
         # pandas can parse from a bytes/text object
         table = pd.read_html(resp.text)[0]
