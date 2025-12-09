@@ -7,6 +7,7 @@ import random
 import ssl
 from urllib.request import urlopen
 import firebase_admin
+import requests
 from firebase_admin import credentials, firestore
 from flask import current_app as app
 import traceback
@@ -153,14 +154,92 @@ def watchlist():
 
         stock_data = []
         for t in random_tickers:
-            info = yf.Ticker(t).info
-            stock_data.append({
-                "name": info.get("shortName", t),
-                "symbol": t,
-                "price": info.get("currentPrice")
-            })
+            try:
+                ticker = yf.Ticker(t)
+                info = ticker.info
+                # Try to get live price from history if currentPrice is not available
+                current_price = info.get("currentPrice")
+                if current_price is None:
+                    history = ticker.history(period="1d", interval="1m")
+                    if not history.empty:
+                        current_price = float(history['Close'].iloc[-1])
+                
+                # Get previous close for change calculation
+                prev_close = info.get("previousClose", current_price)
+                change = current_price - prev_close if current_price and prev_close else 0
+                change_percent = (change / prev_close * 100) if prev_close else 0
+                
+                stock_data.append({
+                    "name": info.get("shortName", t),
+                    "symbol": t,
+                    "price": current_price,
+                    "previousClose": prev_close,
+                    "change": change,
+                    "changePercent": change_percent
+                })
+            except Exception as e:
+                app.logger.error(f"Error fetching data for {t}: {str(e)}")
+                # Add stock with minimal data if fetch fails
+                stock_data.append({
+                    "name": t,
+                    "symbol": t,
+                    "price": None,
+                    "previousClose": None,
+                    "change": 0,
+                    "changePercent": 0
+                })
 
         return jsonify(stock_data)
 
     except Exception as e:
+        app.logger.error(f"Error in watchlist endpoint: {str(e)}")
         return jsonify({"error": "Failed to load watchlist"}), 500
+
+@dashboard_bp.route("/dashboard/live-prices", methods=["POST"])
+def live_prices():
+    try:
+        data = request.get_json()
+        symbols = data.get("symbols", [])
+        
+        if not symbols:
+            return jsonify({"error": "No symbols provided"}), 400
+        
+        price_data = []
+        for symbol in symbols:
+            try:
+                ticker = yf.Ticker(symbol)
+                info = ticker.info
+                
+                # Get live price
+                current_price = info.get("currentPrice")
+                if current_price is None:
+                    history = ticker.history(period="1d", interval="1m")
+                    if not history.empty:
+                        current_price = float(history['Close'].iloc[-1])
+                
+                # Get previous close for change calculation
+                prev_close = info.get("previousClose", current_price)
+                change = current_price - prev_close if current_price and prev_close else 0
+                change_percent = (change / prev_close * 100) if prev_close else 0
+                
+                price_data.append({
+                    "symbol": symbol,
+                    "price": current_price,
+                    "previousClose": prev_close,
+                    "change": change,
+                    "changePercent": change_percent
+                })
+            except Exception as e:
+                app.logger.error(f"Error fetching live price for {symbol}: {str(e)}")
+                price_data.append({
+                    "symbol": symbol,
+                    "price": None,
+                    "previousClose": None,
+                    "change": 0,
+                    "changePercent": 0
+                })
+        
+        return jsonify(price_data)
+    except Exception as e:
+        app.logger.error(f"Error in live-prices endpoint: {str(e)}")
+        return jsonify({"error": "Failed to fetch live prices"}), 500
