@@ -34,29 +34,32 @@ def dashboard_home():
 
 @dashboard_bp.route("/dashboard/balance", methods=["GET"])
 def balance():
-    uid=request.args.get("uid")
+    uid = request.args.get("uid")
+    app.logger.info("Balance request for uid: %r", uid)
     if not uid:
-        return jsonify({
-            "error":"No UID"
-        }),400
-    db = get_db() 
-    user_ref=db.collection("users").document(uid)
-    doc= user_ref.get()
-    if doc.exists:
-        data = doc.to_dict()
-        balance = data.get("balance", 0)
-        profit = data.get("profit", 0)
-        loss = data.get("loss", 0)
-        name = data.get("name")
-        return jsonify({
-            "name": name,
-            "balance": balance,
-            "profit": profit,
-            "loss": loss,
-            "pl": profit - loss
-        })
-    else:
-        return jsonify({"error":"Not Found"}),400
+        return jsonify({"error": "No UID provided"}), 400
+
+    db = get_db()
+    user_ref = db.collection("users").document(uid)
+    doc = user_ref.get()
+    if not doc.exists:
+        app.logger.info("User doc not found for uid: %r", uid)
+        return jsonify({"error": "Not Found"}), 404
+
+    data = doc.to_dict() or {}
+    # return numeric defaults to avoid frontend toFixed crashes
+    balance = float(data.get("balance") or 0.0)
+    profit = float(data.get("profit") or 0.0)
+    loss = float(data.get("loss") or 0.0)
+    name = data.get("name", "")
+
+    return jsonify({
+        "name": name,
+        "balance": balance,
+        "profit": profit,
+        "loss": loss,
+        "pl": profit - loss
+    }), 200
     
 @dashboard_bp.route("/dashboard/updated_balance",methods=["POST"])
 def update_balance():
@@ -141,26 +144,42 @@ def update_sell():
 @dashboard_bp.route("/dashboard/watchlist", methods=["GET"])
 def watchlist():
     try:
-        url= "https://en.wikipedia.org/wiki/List_of_S%26P_500_companies"
-        context = ssl._create_unverified_context()  
-        html = urlopen(url, context=context)
-        table = pd.read_html(html)[0]
-        all_tickers= table["Symbol"].tolist()      #creating a list this becomes an array when we jsonify it 
-        random_tickers = random.sample(all_tickers, 5)
-        
-        stock_data=[] #empty array to store the data
+        url = "https://en.wikipedia.org/wiki/List_of_S%26P_500_companies"
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                          "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36"
+        }
+        resp = requests.get(url, headers=headers, timeout=10)
+        resp.raise_for_status()
+        # pandas can parse from a bytes/text object
+        table = pd.read_html(resp.text)[0]
+        all_tickers = table["Symbol"].tolist()
+        random_tickers = random.sample(all_tickers, min(5, len(all_tickers)))
+
+        stock_data = []
         for ticker in random_tickers:
-            stock=yf.Ticker(ticker)
-            info = stock.info
-            stock_data.append({
-                "name":info.get('shortName',ticker),
-                "symbol": ticker,
-                "price": info.get("currentPrice") 
-            })
-        
+            try:
+                stock = yf.Ticker(ticker)
+                info = stock.info or {}
+                stock_data.append({
+                    "name": info.get("shortName", ticker),
+                    "symbol": ticker,
+                    "price": info.get("currentPrice")  # may be None
+                })
+            except Exception:
+                # per-symbol failure shouldn't blow up entire response
+                stock_data.append({"name": ticker, "symbol": ticker, "price": None})
+
         return jsonify(stock_data)
-        
+
     except Exception as e:
-        app.logger.error("Watchlist exception: %s\n%s", e, traceback.format_exc())
-        return json_error(500, "Failed to load watchlist")
-        
+        app.logger.error("Watchlist error: %s\n%s", e, traceback.format_exc())
+        # fallback static list so frontend still has something to show
+        fallback = [
+            {"name": "Apple Inc.", "symbol": "AAPL", "price": None},
+            {"name": "Microsoft Corp.", "symbol": "MSFT", "price": None},
+            {"name": "Amazon.com, Inc.", "symbol": "AMZN", "price": None},
+            {"name": "Alphabet Inc. (Class A)", "symbol": "GOOGL", "price": None},
+            {"name": "Tesla, Inc.", "symbol": "TSLA", "price": None},
+        ]
+        return jsonify({"error": "Failed to load watchlist", "fallback": fallback}), 500
