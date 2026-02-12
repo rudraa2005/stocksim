@@ -33,7 +33,7 @@ def trades():
 @portfolio_bp.route("/portfolio/chart-data")
 def chart_data():
     """
-    Returns chart data showing buy and sell transactions over time
+    Returns chart data showing cumulative buy and sell trade values over time.
     """
     uid = request.args.get("uid")
     if not uid:
@@ -50,41 +50,61 @@ def chart_data():
             trade_data["id"] = doc.id
             trades.append(trade_data)
         
-        # Sort by timestamp
-        trades.sort(key=lambda x: x.get("timestamp", {}).get("_seconds", 0) if isinstance(x.get("timestamp"), dict) else 0)
+        # ---- Parse timestamps robustly ----
+        def parse_timestamp(ts):
+            """Handle all possible Firestore timestamp formats."""
+            import datetime as dt
+            if ts is None:
+                return None
+            # Firestore DatetimeWithNanoseconds (has .timestamp() method)
+            if hasattr(ts, 'timestamp'):
+                return pd.Timestamp.fromtimestamp(ts.timestamp())
+            # Dict format {"_seconds": ..., "_nanoseconds": ...}
+            if isinstance(ts, dict) and "_seconds" in ts:
+                return pd.Timestamp.fromtimestamp(ts["_seconds"])
+            # Raw epoch (ms or seconds)
+            if isinstance(ts, (int, float)):
+                return pd.Timestamp.fromtimestamp(ts / 1000 if ts > 1e10 else ts)
+            # String format
+            if isinstance(ts, str):
+                try:
+                    return pd.Timestamp(ts)
+                except Exception:
+                    return None
+            return None
+
+        # Parse and sort trades by time
+        parsed_trades = []
+        for trade in trades:
+            ts = parse_timestamp(trade.get("timestamp"))
+            if ts is None:
+                # If no timestamp, use current time as fallback
+                ts = pd.Timestamp.now()
+            parsed_trades.append((ts, trade))
         
-        # Process trades for chart
+        parsed_trades.sort(key=lambda x: x[0])
+        
+        # Build chart data: cumulative values
         buy_data = []
         sell_data = []
         labels = []
         
-        cumulative_buy = 0
-        cumulative_sell = 0
+        cumulative_buy_value = 0
+        cumulative_sell_value = 0
         
-        for trade in trades:
-            timestamp = trade.get("timestamp")
-            date = None
-            
-            # Handle different timestamp formats
-            if isinstance(timestamp, dict) and "_seconds" in timestamp:
-                date = pd.Timestamp.fromtimestamp(timestamp["_seconds"])
-            elif isinstance(timestamp, (int, float)):
-                date = pd.Timestamp.fromtimestamp(timestamp / 1000 if timestamp > 1e10 else timestamp)
-            else:
-                continue
+        for ts, trade in parsed_trades:
+            quantity = float(trade.get("quantity", 0))
+            price = float(trade.get("buy_price", 0) or trade.get("price", 0) or 0)
+            trade_value = price * quantity
             
             if trade.get("buy"):
-                quantity = trade.get("quantity", 0)
-                cumulative_buy += quantity
-                buy_data.append(cumulative_buy)
-                sell_data.append(cumulative_sell)
-                labels.append(date.strftime("%Y-%m-%d %H:%M"))
+                cumulative_buy_value += trade_value
             elif trade.get("sell"):
-                quantity = trade.get("quantity", 0)
-                cumulative_sell += quantity
-                buy_data.append(cumulative_buy)
-                sell_data.append(cumulative_sell)
-                labels.append(date.strftime("%Y-%m-%d %H:%M"))
+                cumulative_sell_value += trade_value
+            
+            buy_data.append(round(cumulative_buy_value, 2))
+            sell_data.append(round(cumulative_sell_value, 2))
+            labels.append(ts.strftime("%b %d, %H:%M"))
         
         # If no trades, return empty data
         if not labels:

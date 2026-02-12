@@ -8,32 +8,32 @@ async function renderChart() {
   try {
     const response = await fetch(`/portfolio/chart-data?uid=${uid}`);
     const chartData = await response.json();
-    
+
     const ctx = document.getElementById('portfolioChart');
     if (!ctx) return;
-    
+
     if (portfolioChart) {
       portfolioChart.destroy();
     }
-    
+
     // Handle empty data
     const labels = chartData.labels || [];
     const buyData = chartData.buyData || [];
     const sellData = chartData.sellData || [];
-    
+
     if (labels.length === 0) {
       // Show empty state message
       ctx.parentElement.innerHTML = '<p style="text-align: center; color: rgba(255,255,255,0.6); padding: 2rem;">No trading activity yet. Start trading to see your activity chart!</p>';
       return;
     }
-    
+
     portfolioChart = new Chart(ctx, {
       type: 'line',
       data: {
         labels: labels,
         datasets: [
           {
-            label: 'Buy Transactions',
+            label: 'Buy Value (₹)',
             data: buyData,
             borderColor: 'rgba(76, 175, 80, 1)',
             backgroundColor: 'rgba(76, 175, 80, 0.1)',
@@ -43,7 +43,7 @@ async function renderChart() {
             pointHoverRadius: 6
           },
           {
-            label: 'Sell Transactions',
+            label: 'Sell Value (₹)',
             data: sellData,
             borderColor: 'rgba(244, 67, 54, 1)',
             backgroundColor: 'rgba(244, 67, 54, 0.1)',
@@ -77,25 +77,26 @@ async function renderChart() {
         },
         scales: {
           x: {
-            ticks: { 
+            ticks: {
               color: 'rgba(255, 255, 255, 0.7)',
               font: {
                 family: 'League Spartan, sans-serif'
               }
             },
-            grid: { 
+            grid: {
               color: 'rgba(255, 255, 255, 0.1)'
             }
           },
           y: {
-            ticks: { 
+            grid: {
+              color: 'rgba(255, 255, 255, 0.1)'
+            },
+            ticks: {
               color: 'rgba(255, 255, 255, 0.7)',
               font: {
                 family: 'League Spartan, sans-serif'
-              }
-            },
-            grid: { 
-              color: 'rgba(255, 255, 255, 0.1)'
+              },
+              callback: (value) => `₹${value.toLocaleString()}`
             }
           }
         }
@@ -163,10 +164,10 @@ fetch(`/portfolio/trades?uid=${uid}`)
 
     // Get all symbols for live price fetch
     const symbols = Object.keys(holdings).filter(symbol => holdings[symbol].quantity > 0);
-    
+
     // Fetch live prices
     const livePrices = await fetchLivePrices(symbols);
-    
+
     // Update live prices in holdings
     symbols.forEach(symbol => {
       if (livePrices[symbol] && livePrices[symbol] > 0) {
@@ -199,7 +200,7 @@ fetch(`/portfolio/trades?uid=${uid}`)
     }
 
     document.getElementById("total-value").textContent = `${totalValue.toFixed(2)}`;
-    
+
     // Render chart after data is loaded
     renderChart();
   })
