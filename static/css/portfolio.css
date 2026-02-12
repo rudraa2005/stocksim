@@ -8,7 +8,7 @@
 /* Body Styling */
 body {
     font-family: 'Lexend Exa', sans-serif;
-    background: radial-gradient(50% 119.08% at 50% 50%, #1C1B1B 0%, #827C7C 0%, #595555 0%, #4B4848 0%, #323030 0%, #1C1B1B 93%);
+    background: #0f0f11;
     color: #fff;
     min-height: 100vh;
     overflow-x: hidden;
@@ -182,7 +182,7 @@ body {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
-.table-Row > div {
+.table-Row>div {
     color: #fff;
     font-size: 1rem;
 }
@@ -232,6 +232,7 @@ body {
 
 /* Responsive Design */
 @media (max-width: 1024px) {
+
     .table-header,
     .table-Row {
         grid-template-columns: 1.2fr 0.8fr 0.8fr 0.8fr 1.2fr 0.8fr;
@@ -267,7 +268,7 @@ body {
         margin-right: 0.5rem;
     }
 
-    .table-Row > div::before {
+    .table-Row>div::before {
         content: attr(data-label) ": ";
         font-weight: 600;
         margin-right: 0.5rem;

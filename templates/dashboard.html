@@ -1,51 +1,92 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard - StockSim</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}" />
-  <link href="https://fonts.googleapis.com/css2?family=Lexend+Zetta&family=League+Spartan&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Lexend+Zetta:wght@100;300;400;600&family=League+Spartan:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 </head>
-<body id="dashboard">
 
-<!-- Loading screen -->
-<div id="loader">
-  <div class="spinner"></div>
-</div>
+<body>
 
-<div id="main-content">
-  <!-- Profile Icon -->
-  <div class="profile"><i class="fa-regular fa-user" style="color: #ffffff;"></i></div>
-
-  <!-- Navigation Menu -->
-  <div class="menu-dashboard">Dashboard</div>
-  <div class="menu-trade"><a href="{{ url_for('trade.trade')}}">Trade</a></div>
-  <div class="menu-watchlist"><a href="{{ url_for('portfolio.portfolio')}}">Portfolio</a></div>
-  <div class="menu-signout"><a href="{{ url_for('auth.login')}}">Sign-out</a></div>
-
-  <!-- Welcome Message -->
-  <div class="welcome">WELCOME, <span id="username-span"></span></div>
-
-  <!-- Portfolio Summary Box -->
-  <div class="summary-box"></div>
-
-  <!-- Total Balance and Profit & Loss -->
-  <div class="total-balance">TOTAL BALANCE:<span id="balance"></span> </div>
-  <div class="total-p">PROFIT:  <span id="p"></span> </div>
-  <div class="total-l">LOSS:  <span id="l"></span> </div>
-
-  <!-- Recent Trades Preview -->
-  <div class="recent-trades">Recent trades →</div>
-
-  <!-- Watchlist Section -->
-  <div class="watchlist-section">
-    <div class="watchlist-heading">WATCHLIST</div>
-    <div id="stock_info"></div>
+  <!-- Loading screen -->
+  <div id="loader">
+    <div class="spinner"></div>
   </div>
-</div>
-<script src="{{ url_for('static', filename='js/auth.js') }}"></script>
-<script type="module" src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+
+  <div id="main-content">
+    <!-- Top Navigation -->
+    <nav class="top-nav">
+      <div class="nav-brand">StockSim</div>
+      <div class="nav-links">
+        <a href="{{ url_for('dashboard.dashboard_home') }}" class="active"><i class="fas fa-chart-line"></i>
+          Dashboard</a>
+        <a href="{{ url_for('trade.trade')}}"><i class="fas fa-exchange-alt"></i> Trade</a>
+        <a href="{{ url_for('portfolio.portfolio')}}"><i class="fas fa-briefcase"></i> Portfolio</a>
+        <a href="{{ url_for('auth.login')}}" class="sign-out"><i class="fas fa-sign-out-alt"></i> Sign Out</a>
+      </div>
+    </nav>
+
+    <!-- Dashboard Content -->
+    <div class="dashboard-grid">
+      <!-- Welcome Section -->
+      <div class="welcome-section">
+        <h1 class="welcome-text">Welcome, <span id="username-span"></span></h1>
+        <p class="welcome-sub">Here's your portfolio overview</p>
+      </div>
+
+      <!-- Stats Cards -->
+      <div class="stats-row">
+        <div class="stat-card balance-card">
+          <div class="stat-icon"><i class="fas fa-wallet"></i></div>
+          <div class="stat-info">
+            <span class="stat-label">Total Balance</span>
+            <span class="stat-value" id="balance">₹0.00</span>
+          </div>
+        </div>
+        <div class="stat-card profit-card">
+          <div class="stat-icon"><i class="fas fa-arrow-trend-up"></i></div>
+          <div class="stat-info">
+            <span class="stat-label">Profit</span>
+            <span class="stat-value green" id="p">₹0.00</span>
+          </div>
+        </div>
+        <div class="stat-card loss-card">
+          <div class="stat-icon"><i class="fas fa-arrow-trend-down"></i></div>
+          <div class="stat-info">
+            <span class="stat-label">Loss</span>
+            <span class="stat-value red" id="l">₹0.00</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="quick-actions">
+        <a href="{{ url_for('trade.trade') }}" class="action-card">
+          <i class="fas fa-exchange-alt"></i>
+          <span>Start Trading</span>
+        </a>
+        <a href="{{ url_for('portfolio.portfolio') }}" class="action-card">
+          <i class="fas fa-briefcase"></i>
+          <span>View Portfolio</span>
+        </a>
+      </div>
+
+      <!-- Watchlist Section -->
+      <div class="watchlist-section">
+        <h2 class="section-title">Watchlist</h2>
+        <div id="stock_info"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+  <script type="module" src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
 </body>
+
 </html>

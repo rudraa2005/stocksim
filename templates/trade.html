@@ -5,19 +5,113 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Trade - Stock Simulator</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/trade.css') }}"/>
-  <link href="https://fonts.googleapis.com/css2?family=League+Spartan&family=Lexend+Zetta&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@300;400;500;600;700&family=Lexend+Zetta:wght@100;300;400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body id="trade">
-  <div class="container">
-    <label for="stock-select">Select Stock:</label>
-    <select id="stock-select">
-      <option value="" disabled selected>Choose a stock to trade</option>
-    </select>
-    <div class="news-panel" id="news-panel">
-      <p>Select a stock from the dropdown above to proceed with buying or selling.</p>
-      <button id="select-button"><a href="{{url_for('trade.buysell')}}">Continue →</a></button>
+<body>
+
+  <!-- Top Navigation -->
+  <nav class="top-nav">
+    <div class="nav-brand">StockSim</div>
+    <div class="nav-links">
+      <a href="{{ url_for('dashboard.dashboard_home') }}"><i class="fas fa-chart-line"></i> Dashboard</a>
+      <a href="{{ url_for('trade.trade') }}" class="active"><i class="fas fa-exchange-alt"></i> Trade</a>
+      <a href="{{ url_for('portfolio.portfolio') }}"><i class="fas fa-briefcase"></i> Portfolio</a>
+      <a href="{{ url_for('auth.login') }}" class="sign-out"><i class="fas fa-sign-out-alt"></i> Sign Out</a>
     </div>
+  </nav>
+
+  <div class="trade-layout">
+    <!-- LEFT SIDEBAR: Stock List -->
+    <aside class="stock-sidebar">
+      <div class="sidebar-header">
+        <h2>Stocks</h2>
+        <div class="search-box">
+          <i class="fas fa-search"></i>
+          <input type="text" id="stock-search" placeholder="Search stocks..." autocomplete="off" />
+        </div>
+      </div>
+      <div class="stock-count" id="stock-count">Loading stocks...</div>
+      <div class="stock-list" id="stock-list">
+        <div class="stock-list-loader">
+          <div class="spinner-small"></div>
+          <span>Loading stocks...</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT: Chart + Trading Controls -->
+    <main class="trade-main">
+      <!-- Empty state (no stock selected) -->
+      <div class="empty-state" id="empty-state">
+        <i class="fas fa-chart-area"></i>
+        <h2>Select a Stock to Trade</h2>
+        <p>Choose a stock from the sidebar to view its chart and start trading</p>
+      </div>
+
+      <!-- Stock detail view (hidden until stock is selected) -->
+      <div class="stock-detail" id="stock-detail" style="display:none;">
+        <!-- Stock Header Info -->
+        <div class="stock-info-bar">
+          <div class="stock-identity">
+            <h1 id="detail-symbol">AAPL</h1>
+            <span id="detail-name">Apple Inc.</span>
+          </div>
+          <div class="stock-price-info">
+            <div class="current-price" id="detail-price">—</div>
+            <div class="price-change-badge" id="detail-change">—</div>
+          </div>
+        </div>
+
+        <!-- Period Selector -->
+        <div class="period-selector">
+          <button class="period-btn active" data-period="1d">1D</button>
+          <button class="period-btn" data-period="5d">5D</button>
+          <button class="period-btn" data-period="1mo">1M</button>
+          <button class="period-btn" data-period="3mo">3M</button>
+          <button class="period-btn" data-period="6mo">6M</button>
+          <button class="period-btn" data-period="1y">1Y</button>
+        </div>
+
+        <!-- Chart -->
+        <div class="chart-container">
+          <div class="chart-loader" id="chart-loader">
+            <div class="spinner-small"></div>
+            <span>Loading chart...</span>
+          </div>
+          <canvas id="stockChart"></canvas>
+        </div>
+
+        <!-- Trading Controls -->
+        <div class="trading-panel">
+          <div class="balance-display">
+            <span class="balance-label">Available Balance</span>
+            <span class="balance-value" id="trade-balance">₹0.00</span>
+          </div>
+          <div class="trade-controls">
+            <div class="quantity-group">
+              <label for="trade-quantity">Quantity</label>
+              <input type="number" id="trade-quantity" placeholder="Enter qty" min="1" step="1" />
+            </div>
+            <div class="total-display">
+              <span class="total-label">Estimated Total</span>
+              <span class="total-value" id="estimated-total">₹0.00</span>
+            </div>
+            <div class="trade-buttons">
+              <button class="btn-buy" id="btn-buy"><i class="fas fa-arrow-up"></i> Buy</button>
+              <button class="btn-sell" id="btn-sell"><i class="fas fa-arrow-down"></i> Sell</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
   </div>
+
+  <!-- Toast notification -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
   <script type="module" src="{{ url_for('static', filename='js/trade.js') }}"></script>
 </body>
 </html>

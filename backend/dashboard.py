@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template,jsonify,request
+from flask import Blueprint, render_template, jsonify, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 dashboard_bp = Blueprint("dashboard", __name__)
 import yfinance as yf
@@ -11,12 +11,6 @@ import requests
 from firebase_admin import credentials, firestore
 from flask import current_app as app
 import traceback
-
-def json_error(status=500, message="Internal server error", body=None):
-    resp = {"error": message}
-    if body:
-        resp["detail"] = body
-    return jsonify(resp), status
 
 def json_error(status=500, message="Internal server error", body=None):
     resp = {"error": message}
@@ -48,7 +42,6 @@ def balance():
         return jsonify({"error": "Not Found"}), 404
 
     data = doc.to_dict() or {}
-    # return numeric defaults to avoid frontend toFixed crashes
     balance = float(data.get("balance") or 0.0)
     profit = float(data.get("profit") or 0.0)
     loss = float(data.get("loss") or 0.0)
@@ -62,38 +55,62 @@ def balance():
         "pl": profit - loss
     }), 200
     
-@dashboard_bp.route("/dashboard/updated_balance",methods=["POST"])
+@dashboard_bp.route("/dashboard/updated_balance", methods=["POST"])
 def update_balance():
     data = request.get_json()
     uid = data.get("uid")
     symbol = data.get("symbol")
-    new_balance= data.get("balance")
+    quantity = data.get("quantity")
     
+    if not uid or not symbol or not quantity:
+        return jsonify({"error": "Missing required fields"}), 400
+    
+    quantity = float(quantity)
+    if quantity <= 0:
+        return jsonify({"error": "Quantity must be positive"}), 400
+
+    # ---- SERVER-SIDE BALANCE VALIDATION ----
+    # Always re-read balance from Firestore to prevent race conditions
+    db = get_db()
+    user_ref = db.collection("users").document(uid)
+    doc = user_ref.get()
+    if not doc.exists:
+        return jsonify({"error": "User not found"}), 404
+    
+    user_data = doc.to_dict() or {}
+    current_balance = float(user_data.get("balance") or 0.0)
+    
+    # Get live price
     ticker = yf.Ticker(symbol)
     history = ticker.history(period="1d", interval="5m")
-    live_price= history['Close'].iloc[-1] 
+    if history.empty:
+        return jsonify({"error": "Could not fetch price for symbol"}), 500
+    live_price = float(history['Close'].iloc[-1])
     
-    curr_price = float(data.get("price"))
+    curr_price = float(data.get("price", live_price))
+    total_cost = live_price * quantity
     
-    quantity = data.get("quantity")
-    profit= round((live_price-curr_price)*quantity,2) if live_price>curr_price else 0
-    loss = round((curr_price - live_price)*quantity,2) if curr_price>live_price else 0
-    totalcost= data.get("totalCost")
-    print("balance:", new_balance)
-    print("profit:", profit)
-    print("loss:", loss)
-    print("symbol:", symbol)
-    print("curr_price:", curr_price)
-    print("live_price:", live_price)
-    print("quantity:", quantity)
-    db = get_db() 
-    user_ref = db.collection("users").document(uid)
+    # CRITICAL: Validate balance BEFORE executing the trade
+    if total_cost > current_balance:
+        return jsonify({
+            "error": "Insufficient balance",
+            "balance": current_balance,
+            "required": round(total_cost, 2)
+        }), 403
+    
+    new_balance = round(current_balance - total_cost, 2)
+    profit = round((live_price - curr_price) * quantity, 2) if live_price > curr_price else 0
+    loss = round((curr_price - live_price) * quantity, 2) if curr_price > live_price else 0
+    
+    # Update user balance
     user_ref.set({
         "balance": new_balance,
         "profit": profit,
         "loss": loss,
         "pl": profit - loss,
     }, merge=True)
+    
+    # Record the trade
     db.collection("users").document(uid).collection("trades").add({
         "symbol": symbol,
         "quantity": quantity,
@@ -103,44 +120,91 @@ def update_balance():
         "pl": profit - loss,
         "buy": True
     })
-    return jsonify({"message":"success", "balance":"balance"})
+    
+    return jsonify({
+        "message": "success",
+        "balance": new_balance,
+        "totalCost": round(total_cost, 2)
+    })
     
 @dashboard_bp.route("/dashboard/update_sell", methods=["POST"])
 def update_sell():
     data = request.get_json()
     
-    uid = data["uid"]
-    symbol = data["symbol"]
-    quantity = data["quantity"]
-    price = data["price"]
-    total_value = data["totalValue"]
-    balance = data["balance"]
-    new_quantity = data["newQuantity"]
-    timestamp = data["timestamp"]
+    uid = data.get("uid")
+    symbol = data.get("symbol")
+    quantity = data.get("quantity")
+    
+    if not uid or not symbol or not quantity:
+        return jsonify({"error": "Missing required fields"}), 400
+    
+    quantity = float(quantity)
+    if quantity <= 0:
+        return jsonify({"error": "Quantity must be positive"}), 400
+    
+    price = float(data.get("price", 0))
+    total_value = float(data.get("totalValue", 0))
+    new_quantity = data.get("newQuantity", 0)
+    timestamp = data.get("timestamp")
+    
     db = get_db() 
     user_ref = db.collection("users").document(uid)
+    
+    # Get live price
     ticker = yf.Ticker(symbol)
     history = ticker.history(period="1d", interval="5m")
-    live_price= history['Close'].iloc[-1] 
-    # Update balance
+    if history.empty:
+        return jsonify({"error": "Could not fetch price for symbol"}), 500
+    live_price = float(history['Close'].iloc[-1])
+    
+    # SERVER-SIDE: Validate the user owns enough shares
+    trades_ref = db.collection("users").document(uid).collection("trades")
+    trades_docs = trades_ref.stream()
+    owned_quantity = 0
+    for trade_doc in trades_docs:
+        trade_data = trade_doc.to_dict()
+        if trade_data.get("symbol") == symbol:
+            if trade_data.get("sell"):
+                owned_quantity -= float(trade_data.get("quantity", 0))
+            elif trade_data.get("buy"):
+                owned_quantity += float(trade_data.get("quantity", 0))
+    
+    if quantity > owned_quantity:
+        return jsonify({
+            "error": "Insufficient shares",
+            "owned": owned_quantity,
+            "requested": quantity
+        }), 403
+    
+    # Re-read balance from Firestore
+    doc = user_ref.get()
+    user_data = doc.to_dict() or {}
+    current_balance = float(user_data.get("balance") or 0.0)
+    
+    sell_value = live_price * quantity
+    new_balance = round(current_balance + sell_value, 2)
+    
     user_ref.update({
-        "balance": balance
+        "balance": new_balance
     })
 
-    # Log the sell trade
     trade_data = {
         "symbol": symbol,
-        "quantity": new_quantity, # still store as positive
-        "oldQuantity":quantity,
+        "quantity": quantity,
+        "oldQuantity": float(data.get("quantity", quantity)),
         "price": price,
         "total": total_value,
         "timestamp": timestamp,
-        "livePrice":live_price,
-        "sell": True  # key part
+        "livePrice": live_price,
+        "sell": True  
     }
     db.collection("users").document(uid).collection("trades").add(trade_data)
 
-    return jsonify({"message": "Sell recorded and balance updated"}), 200
+    return jsonify({
+        "message": "Sell recorded and balance updated",
+        "balance": new_balance,
+        "sellValue": round(sell_value, 2)
+    }), 200
 
 @dashboard_bp.route("/dashboard/watchlist", methods=["GET"])
 def watchlist():
