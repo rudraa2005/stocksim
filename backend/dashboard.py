@@ -209,12 +209,22 @@ def update_sell():
 @dashboard_bp.route("/dashboard/watchlist", methods=["GET"])
 def watchlist():
     try:
-        url = "https://raw.githubusercontent.com/datasets/s-and-p-500-companies/master/data/constituents_symbols.txt"
+        url = "https://raw.githubusercontent.com/datasets/s-and-p-500-companies/master/data/constituents.csv"
         r = requests.get(url, timeout=8)
         r.raise_for_status()
 
-        tickers = [line.strip() for line in r.text.splitlines() if line.strip()]
-        random_tickers = random.sample(tickers, 5)
+        lines = r.text.strip().splitlines()
+        # CSV format: Symbol,Name,Sector — skip header
+        tickers = []
+        for line in lines[1:]:
+            parts = line.split(",")
+            if parts and parts[0].strip():
+                tickers.append(parts[0].strip())
+        
+        if not tickers:
+            tickers = ["AAPL", "MSFT", "AMZN", "GOOGL", "TSLA", "NVDA", "META", "JPM", "V", "UNH"]
+        
+        random_tickers = random.sample(tickers, min(5, len(tickers)))
 
         stock_data = []
         for t in random_tickers:
